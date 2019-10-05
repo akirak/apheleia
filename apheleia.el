@@ -357,6 +357,11 @@ as its sole argument."
                       ;; changes, and 2 if error.
                       (memq status '(0 1)))))))
 
+(defcustom apheleia-verbose nil
+  "Whether to show a message before and after running formatters."
+  :type 'boolean
+  :group 'apheleia)
+
 (defun apheleia--run-formatter (command callback)
   "Run a code formatter on the current buffer.
 The formatter is specified by COMMAND, a list of strings or
@@ -408,6 +413,8 @@ argument, a buffer containing the output of the formatter."
                                   output-fname
                                 arg))
                             command)))
+    (when apheleia-verbose
+      (message "apheleia is processing %s..." (buffer-file-name)))
     (apheleia--make-process
      :command command
      :stdin (unless input-fname
@@ -416,6 +423,8 @@ argument, a buffer containing the output of the formatter."
                  (when output-fname
                    (erase-buffer)
                    (insert-file-contents-literally output-fname))
+                 (when apheleia-verbose
+                   (message "apheleia finished on %s" (buffer-file-name)))
                  (funcall callback stdout)))))
 
 (defcustom apheleia-formatters
